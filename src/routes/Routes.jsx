@@ -13,6 +13,7 @@ import Feature from "../pages/Feature";
 import Category from "../pages/Category";
 import Faq from "../pages/Faq";
 import TeamMembers from "../pages/TeamMembers";
+import Mission from "../pages/Mission";
 
 const Routes = createBrowserRouter([
   {
@@ -41,6 +42,7 @@ const Routes = createBrowserRouter([
       { path: "/category", element: <Category /> },
       { path: "/faq", element: <Faq /> },
       { path: "/team_members", element: <TeamMembers /> },
+      { path: "/mission", element: <Mission /> },
     ],
   },
 ]);
