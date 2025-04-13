@@ -12,6 +12,7 @@ import ControllPanel from "../pages/ControllPanel";
 import Feature from "../pages/Feature";
 import Category from "../pages/Category";
 import Faq from "../pages/Faq";
+import TeamMembers from "../pages/TeamMembers";
 
 const Routes = createBrowserRouter([
   {
@@ -39,6 +40,7 @@ const Routes = createBrowserRouter([
       { path: "/feature", element: <Feature /> },
       { path: "/category", element: <Category /> },
       { path: "/faq", element: <Faq /> },
+      { path: "/team_members", element: <TeamMembers /> },
     ],
   },
 ]);
