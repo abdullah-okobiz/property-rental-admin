@@ -17,16 +17,45 @@ const {
   processDeleteAboutUs,
 } = AboutUsServices;
 
+// YouTube URL parser to get video ID
+const getYouTubeVideoId = (url) => {
+  if (!url) return null;
+
+  // Handle different YouTube URL formats
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+  const match = url.match(regExp);
+
+  return match && match[2].length === 11 ? match[2] : null;
+};
+
+// YouTube Video Embed Component
+const YouTubeEmbed = ({ url }) => {
+  const videoId = getYouTubeVideoId(url);
+
+  if (!videoId) {
+    return <div>Invalid YouTube URL</div>;
+  }
+
+  return (
+    <div className="video-responsive">
+      <iframe
+        width="400"
+        height="200"
+        src={`https://www.youtube.com/embed/${videoId}`}
+        title="YouTube video player"
+        frameBorder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+      ></iframe>
+    </div>
+  );
+};
+
 // Integrated Description Component
 const Description = ({ content }) => {
   if (!content) return <span>No description available</span>;
-
-  return (
-    <div
-      className="description-content"
-      dangerouslySetInnerHTML={{ __html: content }}
-    />
-  );
+  console.log(content);
+  return <div dangerouslySetInnerHTML={{ __html: content }} />;
 };
 
 const AboutUs = () => {
@@ -110,9 +139,10 @@ const AboutUs = () => {
 
   const columns = [
     {
-      title: "Video URL",
+      title: "Video",
       dataIndex: "videoUrl",
       key: "videoUrl",
+      render: (videoUrl) => <YouTubeEmbed url={videoUrl} />,
     },
     {
       title: "Description",
@@ -178,7 +208,7 @@ const AboutUs = () => {
             label="Video URL"
             rules={[{ required: true, message: "Please enter the video URL" }]}
           >
-            <Input placeholder="Enter YouTube or other video URL" />
+            <Input placeholder="Enter YouTube URL (e.g., https://www.youtube.com/watch?v=Ha4fSclVanI)" />
           </Form.Item>
 
           <Form.Item
