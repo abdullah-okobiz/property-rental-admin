@@ -1,19 +1,203 @@
-import React from "react";
-import { AiOutlineClockCircle } from "react-icons/ai";
+import { Button, Form, Input, Modal, Popconfirm, Table, message } from "antd";
+import {
+  EditOutlined,
+  DeleteOutlined,
+  PlusSquareOutlined,
+} from "@ant-design/icons";
+import { useState } from "react";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
+import AboutUsServices from "../services/aboutUs.services";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+
+const {
+  processAddAboutUs,
+  processEditAboutUs,
+  processGetAboutUs,
+  processDeleteAboutUs,
+} = AboutUsServices;
+
+// Integrated Description Component
+const Description = ({ content }) => {
+  if (!content) return <span>No description available</span>;
+
+  return (
+    <div
+      className="description-content"
+      dangerouslySetInnerHTML={{ __html: content }}
+    />
+  );
+};
 
 const AboutUs = () => {
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [editingItem, setEditingItem] = useState(null);
+  const [form] = Form.useForm();
+  const queryClient = useQueryClient();
+
+  // Fetch AboutUs data
+  const { data: aboutUsData = [], isLoading } = useQuery({
+    queryKey: ["aboutUs"],
+    queryFn: processGetAboutUs,
+  });
+
+  // Add AboutUs mutation
+  const addMutation = useMutation({
+    mutationFn: processAddAboutUs,
+    onSuccess: () => {
+      message.success("About Us section added successfully");
+      queryClient.invalidateQueries({ queryKey: ["aboutUs"] });
+      setIsModalVisible(false);
+      form.resetFields();
+    },
+    onError: (error) => {
+      message.error(`Failed to add: ${error.message}`);
+    },
+  });
+
+  // Edit AboutUs mutation
+  const editMutation = useMutation({
+    mutationFn: ({ id, payload }) => processEditAboutUs(id, payload),
+    onSuccess: () => {
+      message.success("About Us section updated successfully");
+      queryClient.invalidateQueries({ queryKey: ["aboutUs"] });
+      setIsModalVisible(false);
+      setEditingItem(null);
+      form.resetFields();
+    },
+    onError: (error) => {
+      message.error(`Failed to update: ${error.message}`);
+    },
+  });
+
+  // Delete AboutUs mutation
+  const deleteMutation = useMutation({
+    mutationFn: processDeleteAboutUs,
+    onSuccess: () => {
+      message.success("About Us section deleted successfully");
+      queryClient.invalidateQueries({ queryKey: ["aboutUs"] });
+    },
+    onError: (error) => {
+      message.error(`Failed to delete: ${error.message}`);
+    },
+  });
+
+  // Handle form submission
+  const handleFormSubmit = (values) => {
+    if (editingItem) {
+      editMutation.mutate({ id: editingItem._id, payload: values });
+    } else {
+      addMutation.mutate(values);
+    }
+  };
+
+  // Handle edit button click
+  const handleEdit = (record) => {
+    setEditingItem(record);
+    setIsModalVisible(true);
+    form.setFieldsValue({
+      videoUrl: record.videoUrl,
+      description: record.description,
+    });
+  };
+
+  // Handle modal cancel
+  const handleModalCancel = () => {
+    setIsModalVisible(false);
+    setEditingItem(null);
+    form.resetFields();
+  };
+
+  const columns = [
+    {
+      title: "Video URL",
+      dataIndex: "videoUrl",
+      key: "videoUrl",
+    },
+    {
+      title: "Description",
+      dataIndex: "description",
+      key: "description",
+      render: (description) => <Description content={description} />,
+    },
+    {
+      title: "Actions",
+      key: "actions",
+      render: (_, record) => (
+        <div className="flex flex-col gap-1">
+          <Button
+            icon={<EditOutlined />}
+            onClick={() => handleEdit(record)}
+            style={{ marginRight: 8 }}
+          />
+          <Popconfirm
+            title="Are you sure to delete this item?"
+            onConfirm={() => deleteMutation.mutate(record._id)}
+            okText="Yes"
+            cancelText="No"
+          >
+            <Button icon={<DeleteOutlined />} danger />
+          </Popconfirm>
+        </div>
+      ),
+    },
+  ];
+
   return (
-    <div className="flex items-center justify-center min-h-screen px-4 bg-gray-50">
-      <div className="bg-white shadow-md rounded-2xl p-8 text-center max-w-md w-full border border-gray-100">
-        <AiOutlineClockCircle
-          size={64}
-          className="text-yellow-500 mb-4 mx-auto"
-        />
-        <h2 className="text-3xl font-bold mb-2 text-gray-800">Coming Soon</h2>
-        <p className="text-gray-500">
-          We're working hard to launch this page. Please check back later!
-        </p>
+    <div className="w-full bg-white my-6 p-8 rounded-md">
+      <div className="flex justify-between mb-4">
+        <h1 className="text-2xl font-bold">About Us</h1>
+        <Button
+          className="custom-button"
+          onClick={() => setIsModalVisible(true)}
+          style={{ marginBottom: 16 }}
+        >
+          <PlusSquareOutlined /> Add New
+        </Button>
       </div>
+
+      <Table
+        dataSource={aboutUsData}
+        columns={columns}
+        rowKey="_id"
+        loading={isLoading}
+        scroll={{ x: "max-content" }}
+      />
+
+      <Modal
+        title={
+          editingItem ? "Edit About Us Section" : "Create About Us Section"
+        }
+        open={isModalVisible}
+        onCancel={handleModalCancel}
+        footer={null}
+      >
+        <Form form={form} onFinish={handleFormSubmit} layout="vertical">
+          <Form.Item
+            name="videoUrl"
+            label="Video URL"
+            rules={[{ required: true, message: "Please enter the video URL" }]}
+          >
+            <Input placeholder="Enter YouTube or other video URL" />
+          </Form.Item>
+
+          <Form.Item
+            name="description"
+            label="Description"
+            rules={[{ required: true, message: "Please enter a description" }]}
+          >
+            <ReactQuill theme="snow" />
+          </Form.Item>
+
+          <Button
+            className="custom-button"
+            htmlType="submit"
+            loading={addMutation.isPending || editMutation.isPending}
+          >
+            {editingItem ? "Update" : "Save"}
+          </Button>
+        </Form>
+      </Modal>
     </div>
   );
 };

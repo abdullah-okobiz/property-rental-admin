@@ -19,7 +19,6 @@ const TeamMemberServices = {
 
   processAddTeamMember: async (payload) => {
     try {
-      console.log("add team member service", payload.getAll("teamMemberImage"));
       const response = await addTeamMemberApi(payload);
       return response?.data;
     } catch (error) {
