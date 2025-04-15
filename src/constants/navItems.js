@@ -24,7 +24,7 @@ export const menuItems = [
   { key: "dashboard", label: "Dashboard", icon: FaTachometerAlt },
   { key: "host-management", label: "Host Management", icon: FaUserShield },
   { key: "guest-management", label: "Guest Management", icon: FaUserFriends },
-  { key: "blog-management", label: "Blog Management", icon: FaBlog },
+  { key: "contact_us", label: "Contact Us", icon: FiPhoneCall },
   { key: "payment", label: "Payment", icon: FaMoneyCheckAlt },
   {
     key: "control-panel",
@@ -45,7 +45,7 @@ export const menuItems = [
       { key: "why_choose_us", label: "Why Choose Us", icon: FiThumbsUp },
       { key: "partners", label: "Partners", icon: FiBriefcase },
       { key: "about_us", label: "About Us", icon: FiInfo },
-      { key: "contact_us", label: "Contact Us", icon: FiPhoneCall },
+      { key: "blog-management", label: "Blog", icon: FaBlog },
     ],
   },
 ];

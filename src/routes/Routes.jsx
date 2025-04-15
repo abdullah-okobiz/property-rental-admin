@@ -15,6 +15,10 @@ import Faq from "../pages/Faq";
 import TeamMembers from "../pages/TeamMembers";
 import Mission from "../pages/Mission";
 import Vission from "../pages/Vission";
+import AboutUs from "../pages/AboutUs";
+import Partners from "../pages/Partners";
+import WhyChooseUs from "../pages/WhyChooseUs";
+import ContactUs from "../pages/ContactUs";
 
 const Routes = createBrowserRouter([
   {
@@ -45,6 +49,10 @@ const Routes = createBrowserRouter([
       { path: "/team_members", element: <TeamMembers /> },
       { path: "/mission", element: <Mission /> },
       { path: "/vision", element: <Vission /> },
+      { path: "/about_us", element: <AboutUs /> },
+      { path: "/partners", element: <Partners /> },
+      { path: "/why_choose_us", element: <WhyChooseUs /> },
+      { path: "/contact_us", element: <ContactUs /> },
     ],
   },
 ]);
