@@ -63,11 +63,7 @@ const BlogManagement = () => {
   }, [isBlogError]);
 
   // Add Blog
-  const {
-    mutate: addBlog,
-    isLoading: isAdding,
-    isError: isAddError,
-  } = useMutation({
+  const { mutate: addBlog, isLoading: isAdding } = useMutation({
     mutationFn: processAddBlog,
     onSuccess: () => {
       message.success("Blog added successfully");
@@ -81,11 +77,7 @@ const BlogManagement = () => {
   });
 
   // Edit Blog
-  const {
-    mutate: editBlog,
-    isLoading: isEditing,
-    isError: isEditError,
-  } = useMutation({
+  const { mutate: editBlog, isLoading: isEditing } = useMutation({
     mutationFn: ({ id, data }) => processEditBlog(id, data),
     onSuccess: () => {
       message.success("Blog updated successfully");
@@ -129,14 +121,12 @@ const BlogManagement = () => {
   const handleFormSubmit = (values) => {
     const formData = {
       ...values,
-      blogImage: fileList.map((file) => file.originFileObj), // Assuming fileList contains image data
+      blogImage: fileList.map((file) => file.originFileObj),
     };
 
     if (editingBlog) {
-      console.log("Editing blog with data:", formData); // Debugging log
       editBlog({ id: editingBlog._id, data: formData });
     } else {
-      console.log("Adding new blog with data:", formData); // Debugging log
       addBlog(formData);
     }
   };
@@ -147,7 +137,7 @@ const BlogManagement = () => {
     form.setFieldsValue({
       blogTitle: record.blogTitle,
       blogDescription: record.blogDescription,
-      feature: record.feature,
+      feature: record.feature?._id, // FIXED: Use feature ID
       tags: record.tags,
     });
     setFileList([
@@ -182,10 +172,7 @@ const BlogManagement = () => {
       title: "Feature",
       dataIndex: "feature",
       key: "feature",
-      render: (featureId) => {
-        const matched = features.find((f) => f._id === featureId);
-        return matched ? matched.featureName : "Unknown";
-      },
+      render: (feature) => feature?.featureName || "Unknown", // FIXED: Display name
     },
     {
       title: "Tags",
