@@ -21,13 +21,10 @@ import "react-quill/dist/quill.snow.css";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import BlogServices from "../services/blog.services";
 import FeatureServices from "../services/feature.services";
+import { baseUrl } from "../constants/env";
 
-const {
-  processAddBlog,
-  processDeleteBlog,
-  processEditBlog,
-  processGetBlogs,
-} = BlogServices;
+const { processAddBlog, processDeleteBlog, processEditBlog, processGetBlogs } =
+  BlogServices;
 const { processGetFeature } = FeatureServices;
 
 const { Option } = Select;
@@ -48,11 +45,15 @@ const BlogManagement = () => {
   const features = featureRes?.data || [];
 
   // Fetch blogs
-  const { data: blogRes, isLoading: isBlogLoading, isError: isBlogError } = useQuery({
+  const {
+    data: blogRes,
+    isLoading: isBlogLoading,
+    isError: isBlogError,
+  } = useQuery({
     queryKey: ["blogs"],
     queryFn: processGetBlogs,
   });
-  const blogs = blogRes?.data || [];
+  const blogs = blogRes || [];
 
   // Handle API Error
   useEffect(() => {
@@ -62,7 +63,11 @@ const BlogManagement = () => {
   }, [isBlogError]);
 
   // Add Blog
-  const { mutate: addBlog, isLoading: isAdding, isError: isAddError } = useMutation({
+  const {
+    mutate: addBlog,
+    isLoading: isAdding,
+    isError: isAddError,
+  } = useMutation({
     mutationFn: processAddBlog,
     onSuccess: () => {
       message.success("Blog added successfully");
@@ -76,7 +81,11 @@ const BlogManagement = () => {
   });
 
   // Edit Blog
-  const { mutate: editBlog, isLoading: isEditing, isError: isEditError } = useMutation({
+  const {
+    mutate: editBlog,
+    isLoading: isEditing,
+    isError: isEditError,
+  } = useMutation({
     mutationFn: ({ id, data }) => processEditBlog(id, data),
     onSuccess: () => {
       message.success("Blog updated successfully");
@@ -146,7 +155,7 @@ const BlogManagement = () => {
         uid: record._id,
         name: record.blogImage,
         status: "done",
-        url: record.blogImage, // Assuming blogImage contains the URL of the image
+        url: `${baseUrl}${record.blogImage}`,
       },
     ]);
   };
@@ -157,7 +166,11 @@ const BlogManagement = () => {
       dataIndex: "blogImage",
       key: "blogImage",
       render: (imgUrl) => (
-        <img src={imgUrl} alt="blog" className="w-[200px] rounded" />
+        <img
+          src={`${baseUrl}${imgUrl}`}
+          alt="blog"
+          className="w-[200px] rounded"
+        />
       ),
     },
     {
