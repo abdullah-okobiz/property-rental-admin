@@ -23,8 +23,7 @@ import BlogServices from "../services/blog.services";
 import FeatureServices from "../services/feature.services";
 import { baseUrl } from "../constants/env";
 
-const { processAddBlog, processDeleteBlog, processEditBlog, processGetBlogs } =
-  BlogServices;
+const { processAddBlog, processDeleteBlog, processEditBlog, processGetBlogs } = BlogServices;
 const { processGetFeature } = FeatureServices;
 
 const { Option } = Select;
@@ -45,17 +44,12 @@ const BlogManagement = () => {
   const features = featureRes?.data || [];
 
   // Fetch blogs
-  const {
-    data: blogRes,
-    isLoading: isBlogLoading,
-    isError: isBlogError,
-  } = useQuery({
+  const { data: blogRes, isLoading: isBlogLoading, isError: isBlogError } = useQuery({
     queryKey: ["blogs"],
     queryFn: processGetBlogs,
   });
   const blogs = blogRes || [];
 
-  // Handle API Error
   useEffect(() => {
     if (isBlogError) {
       message.error("Error fetching blogs");
@@ -67,11 +61,10 @@ const BlogManagement = () => {
     mutationFn: processAddBlog,
     onSuccess: () => {
       message.success("Blog added successfully");
-      queryClient.invalidateQueries({ queryKey: ["blogs"] });
+      queryClient.invalidateQueries(["blogs"]);
       handleModalCancel();
     },
-    onError: (error) => {
-      console.error(error);
+    onError: () => {
       message.error("Failed to add blog");
     },
   });
@@ -81,21 +74,20 @@ const BlogManagement = () => {
     mutationFn: ({ id, data }) => processEditBlog(id, data),
     onSuccess: () => {
       message.success("Blog updated successfully");
-      queryClient.invalidateQueries({ queryKey: ["blogs"] });
+      queryClient.invalidateQueries(["blogs"]);
       handleModalCancel();
     },
-    onError: (error) => {
-      console.error(error);
+    onError: () => {
       message.error("Failed to update blog");
     },
   });
 
   // Delete Blog
   const { mutate: deleteBlog, isLoading: isDeleting } = useMutation({
-    mutationFn: (id) => processDeleteBlog(id),
+    mutationFn: processDeleteBlog,
     onSuccess: () => {
       message.success("Blog deleted successfully");
-      queryClient.invalidateQueries({ queryKey: ["blogs"] });
+      queryClient.invalidateQueries(["blogs"]);
     },
     onError: () => {
       message.error("Failed to delete blog");
@@ -118,16 +110,29 @@ const BlogManagement = () => {
     return false;
   };
 
-  const handleFormSubmit = (values) => {
-    const formData = {
-      ...values,
-      blogImage: fileList.map((file) => file.originFileObj),
-    };
+  const handleFormSubmit = async (values) => {
+    try {
+      const formData = new FormData();
+      formData.append("blogTitle", values.blogTitle);
+      formData.append("blogDescription", values.blogDescription || "");
+      formData.append("feature", values.feature || "");
 
-    if (editingBlog) {
-      editBlog({ id: editingBlog._id, data: formData });
-    } else {
-      addBlog(formData);
+      values.tags?.forEach((tag) => {
+        formData.append("tags", tag);
+      });
+
+      if (fileList.length > 0 && fileList[0].originFileObj) {
+        formData.append("blogImage", fileList[0].originFileObj);
+      }
+
+      if (editingBlog) {
+        editBlog({ id: editingBlog._id, data: formData });
+      } else {
+        addBlog(formData);
+      }
+    } catch (err) {
+      console.error("Error submitting blog form:", err);
+      message.error("Failed to submit blog");
     }
   };
 
@@ -137,12 +142,12 @@ const BlogManagement = () => {
     form.setFieldsValue({
       blogTitle: record.blogTitle,
       blogDescription: record.blogDescription,
-      feature: record.feature?._id, // FIXED: Use feature ID
+      feature: record.feature?._id,
       tags: record.tags,
     });
     setFileList([
       {
-        uid: record._id,
+        uid: "-1",
         name: record.blogImage,
         status: "done",
         url: `${baseUrl}${record.blogImage}`,
@@ -156,11 +161,7 @@ const BlogManagement = () => {
       dataIndex: "blogImage",
       key: "blogImage",
       render: (imgUrl) => (
-        <img
-          src={`${baseUrl}${imgUrl}`}
-          alt="blog"
-          className="w-[200px] rounded"
-        />
+        <img src={`${baseUrl}${imgUrl}`} alt="blog" className="w-[200px] rounded" />
       ),
     },
     {
@@ -172,7 +173,7 @@ const BlogManagement = () => {
       title: "Feature",
       dataIndex: "feature",
       key: "feature",
-      render: (feature) => feature?.featureName || "Unknown", // FIXED: Display name
+      render: (feature) => feature?.featureName || "Unknown",
     },
     {
       title: "Tags",
@@ -185,11 +186,7 @@ const BlogManagement = () => {
       key: "actions",
       render: (_, record) => (
         <div className="flex flex-col gap-1">
-          <Button
-            icon={<EditOutlined />}
-            onClick={() => handleEdit(record)}
-            style={{ marginBottom: 4 }}
-          />
+          <Button icon={<EditOutlined />} onClick={() => handleEdit(record)} />
           <Popconfirm
             title="Are you sure to delete this blog?"
             onConfirm={() => deleteBlog(record._id)}
@@ -212,19 +209,13 @@ const BlogManagement = () => {
         </Button>
       </div>
 
-      {isBlogLoading ? (
-        <p>Loading blogs...</p>
-      ) : blogs.length === 0 ? (
-        <p>No blogs available</p>
-      ) : (
-        <Table
-          dataSource={blogs}
-          columns={columns}
-          rowKey="_id"
-          loading={isBlogLoading || isDeleting}
-          scroll={{ x: "max-content" }}
-        />
-      )}
+      <Table
+        dataSource={blogs}
+        columns={columns}
+        rowKey="_id"
+        loading={isBlogLoading || isDeleting}
+        scroll={{ x: "max-content" }}
+      />
 
       <Modal
         title={editingBlog ? "Edit Blog" : "Create Blog"}
@@ -266,7 +257,7 @@ const BlogManagement = () => {
               fileList={fileList}
               onChange={handleFileChange}
               onRemove={handleRemoveImage}
-              multiple
+              multiple={false}
             >
               {fileList.length >= 1 ? null : (
                 <div>
