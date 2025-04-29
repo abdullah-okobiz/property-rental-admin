@@ -49,7 +49,7 @@ const HostManagement = () => {
     queryFn: () => processSearchHost(debouncedSearch),
     enabled: !!debouncedSearch,
   });
-  console.log(searchResults.data);
+  console.log(searchResults?.data);
   const { mutate: changeStatus } = useMutation({
     mutationFn: ({ id, status }) =>
       processChangeAccountStatus(id, { accountStatus: status }),
@@ -175,7 +175,7 @@ const HostManagement = () => {
       className="w-full bg-white my-6 p-8 rounded-md overflow-y-auto"
       style={{ maxHeight: "80vh" }}
     >
-      <h1 className="text-2xl font-bold mb-4">User Management</h1>
+      <h1 className="text-2xl font-bold mb-4">Host Management</h1>
 
       <div className="flex flex-col md:flex-row gap-4 mb-6">
         <Input
@@ -197,7 +197,6 @@ const HostManagement = () => {
           allowClear
           style={{ width: 180 }}
         >
-          <Option value="">None</Option>
           <Option value="active">Active</Option>
           <Option value="inactive">Inactive</Option>
           <Option value="pending">Pending</Option>
@@ -212,9 +211,9 @@ const HostManagement = () => {
             setSortOrder(value);
             setPage(1);
           }}
+          allowClear
           style={{ width: 150 }}
         >
-          <Option value={""}>None</Option>
           <Option value={1}>New</Option>
           <Option value={-1}>Old</Option>
         </Select>
@@ -228,11 +227,13 @@ const HostManagement = () => {
         <Table
           dataSource={
             debouncedSearch
-              ? Array.isArray(searchResults?.data)
-                ? searchResults?.data
+              ? searchResults?.data
+                ? Array.isArray(searchResults.data)
+                  ? searchResults.data
+                  : [searchResults.data]
                 : []
               : Array.isArray(usersData?.data)
-              ? usersData?.data
+              ? usersData.data
               : []
           }
           columns={columns}
