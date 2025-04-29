@@ -12,6 +12,9 @@ const HostManagementApis = {
   deleteAnUser: (id) => {
     return axiosClient.delete(`/admin/users/${id}`);
   },
+  searchHost: (user) => {
+    return axiosClient.get(`/admin/search/users?role=host&user=${user}`);
+  },
 };
 
 export default HostManagementApis;

@@ -1,6 +1,7 @@
 import HostManagementApis from "../apis/hostManagement.apis";
 
-const { getAllHosts, changeAccountStatus, deleteAnUser } = HostManagementApis;
+const { getAllHosts, changeAccountStatus, deleteAnUser, searchHost } =
+  HostManagementApis;
 
 const HostManagementServices = {
   processGetAllHost: async (accountStaus, page, sort) => {
@@ -30,6 +31,18 @@ const HostManagementServices = {
   processHostDelete: async (id) => {
     try {
       const data = await deleteAnUser(id);
+      return data.data;
+    } catch (error) {
+      if (error instanceof Error) {
+        throw error;
+      } else {
+        throw new Error("Unknown Occured In Process Host Delete");
+      }
+    }
+  },
+  processSearchHost: async (user) => {
+    try {
+      const data = await searchHost(user);
       return data.data;
     } catch (error) {
       if (error instanceof Error) {

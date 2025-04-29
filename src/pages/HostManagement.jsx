@@ -1,66 +1,85 @@
-import { Table, Button, Select, Popconfirm, Input, Image } from "antd";
+import {
+  Table,
+  Button,
+  Select,
+  Popconfirm,
+  Input,
+  Image,
+  message,
+  Spin,
+} from "antd";
 import { DeleteOutlined, SearchOutlined } from "@ant-design/icons";
 import { useState } from "react";
 import HostManagementServices from "../services/hostManagement.services";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import useDebounce from "../hooks/useDebounce";
+import { baseUrl } from "../constants/env";
 
 const { Option } = Select;
-const {processGetAllHost,processChangeAccountStatus,processHostDelete}=HostManagementServices
+const {
+  processGetAllHost,
+  processChangeAccountStatus,
+  processHostDelete,
+  processSearchHost,
+} = HostManagementServices;
 
 const HostManagement = () => {
-  const [users] = useState([
-    {
-      _id: "680dd2a7f04e702efc3bbe9c",
-      avatar: null,
-      email: "somudrochowdhury08@gmail.com",
-      isVerified: true,
-      accountStatus: "active",
-      name: "jhon doe",
-      role: "host",
-      identityDocument: {
-        _id: "680dd7eeb58f1aa9d95d6111",
-        documentType: "nid",
-        frontSide:
-          "http://localhost:5000/api/v1/public/20240628_205927-1745737710942-.jpg",
-        backSide:
-          "http://localhost:5000/api/v1/public/PLP-NJ2022117-2-1745737710947-.jpg",
-      },
-      createdAt: "2025-04-27T06:45:59.226Z",
-      updatedAt: "2025-04-27T07:12:55.524Z",
-    },
-  ]);
-
   const [searchText, setSearchText] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
-  const [sortOrder, setSortOrder] = useState("new");
+  const [sortOrder, setSortOrder] = useState("");
+  const [page, setPage] = useState(1);
+
+  const queryClient = useQueryClient();
+
+  // Debounce for search input
+  const debouncedSearch = useDebounce(searchText, 500);
+
+  const {
+    data: usersData,
+    isLoading,
+    isFetching,
+  } = useQuery({
+    queryKey: ["hosts", statusFilter, page, sortOrder],
+    queryFn: () => processGetAllHost(statusFilter || "", page, sortOrder || ""),
+    keepPreviousData: true,
+    enabled: !debouncedSearch, // Disable if searching
+  });
+  const { data: searchResults, isLoading: searchLoading } = useQuery({
+    queryKey: ["search-hosts", debouncedSearch],
+    queryFn: () => processSearchHost(debouncedSearch),
+    enabled: !!debouncedSearch,
+  });
+  console.log(searchResults.data);
+  const { mutate: changeStatus } = useMutation({
+    mutationFn: ({ id, status }) =>
+      processChangeAccountStatus(id, { accountStatus: status }),
+    onSuccess: () => {
+      message.success("Account status updated");
+      queryClient.invalidateQueries(["hosts"]);
+    },
+    onError: () => {
+      message.error("Failed to update account status");
+    },
+  });
+
+  const { mutate: deleteUser } = useMutation({
+    mutationFn: processHostDelete,
+    onSuccess: () => {
+      message.success("User deleted");
+      queryClient.invalidateQueries(["hosts"]);
+    },
+    onError: () => {
+      message.error("Failed to delete user");
+    },
+  });
 
   const handleAccountStatusChange = (value, userId) => {
-    console.log(`Change status of ${userId} to ${value}`);
+    changeStatus({ id: userId, status: value });
   };
 
   const handleDeleteUser = (userId) => {
-    console.log(`Delete user ${userId}`);
+    deleteUser(userId);
   };
-
-  const filteredUsers = users
-    .filter((user) => {
-      const matchesSearch =
-        user.name.toLowerCase().includes(searchText.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchText.toLowerCase());
-
-      const matchesStatus = statusFilter
-        ? user.accountStatus === statusFilter
-        : true;
-
-      return matchesSearch && matchesStatus;
-    })
-    .sort((a, b) => {
-      if (sortOrder === "new") {
-        return new Date(b.createdAt) - new Date(a.createdAt);
-      } else {
-        return new Date(a.createdAt) - new Date(b.createdAt);
-      }
-    });
 
   const columns = [
     {
@@ -105,11 +124,9 @@ const HostManagement = () => {
           onChange={(value) => handleAccountStatusChange(value, record._id)}
           style={{ width: 120 }}
         >
-          <Option value="active">Active</Option>
-          <Option value="inactive">Inactive</Option>
-          <Option value="pending">Pending</Option>
-          <Option value="suspended">Suspended</Option>
           <Option value="rejected">Rejected</Option>
+          <Option value="active">Active</Option>
+          <Option value="suspended">Suspended</Option>
         </Select>
       ),
     },
@@ -125,13 +142,13 @@ const HostManagement = () => {
         <div className="flex flex-col gap-2">
           <Image
             width={80}
-            src={identityDocument?.frontSide}
+            src={`${baseUrl}${identityDocument?.frontSide}`}
             alt="Front Side"
             placeholder
           />
           <Image
             width={80}
-            src={identityDocument?.backSide}
+            src={`${baseUrl}${identityDocument?.backSide}`}
             alt="Back Side"
             placeholder
           />
@@ -161,7 +178,6 @@ const HostManagement = () => {
       <h1 className="text-2xl font-bold mb-4">User Management</h1>
 
       <div className="flex flex-col md:flex-row gap-4 mb-6">
-        {/* Search Bar */}
         <Input
           placeholder="Search by name or email"
           prefix={<SearchOutlined />}
@@ -171,14 +187,17 @@ const HostManagement = () => {
           style={{ width: 250 }}
         />
 
-        {/* Account Status Filter */}
         <Select
           placeholder="Filter by Status"
           value={statusFilter}
-          onChange={(value) => setStatusFilter(value)}
+          onChange={(value) => {
+            setStatusFilter(value);
+            setPage(1);
+          }}
           allowClear
           style={{ width: 180 }}
         >
+          <Option value="">None</Option>
           <Option value="active">Active</Option>
           <Option value="inactive">Inactive</Option>
           <Option value="pending">Pending</Option>
@@ -186,25 +205,47 @@ const HostManagement = () => {
           <Option value="rejected">Rejected</Option>
         </Select>
 
-        {/* Sort By */}
         <Select
           placeholder="Sort By"
           value={sortOrder}
-          onChange={(value) => setSortOrder(value)}
+          onChange={(value) => {
+            setSortOrder(value);
+            setPage(1);
+          }}
           style={{ width: 150 }}
         >
-          <Option value="new">New</Option>
-          <Option value="old">Old</Option>
+          <Option value={""}>None</Option>
+          <Option value={1}>New</Option>
+          <Option value={-1}>Old</Option>
         </Select>
       </div>
 
-      <Table
-        dataSource={filteredUsers}
-        columns={columns}
-        rowKey="_id"
-        pagination={false}
-        scroll={{ x: "max-content" }}
-      />
+      {isLoading || isFetching || searchLoading ? (
+        <div className="text-center py-10">
+          <Spin />
+        </div>
+      ) : (
+        <Table
+          dataSource={
+            debouncedSearch
+              ? Array.isArray(searchResults?.data)
+                ? searchResults?.data
+                : []
+              : Array.isArray(usersData?.data)
+              ? usersData?.data
+              : []
+          }
+          columns={columns}
+          rowKey="_id"
+          pagination={{
+            current: page,
+            pageSize: 10,
+            total: usersData?.totalUsers || 0,
+            onChange: (p) => setPage(p),
+          }}
+          scroll={{ x: "max-content" }}
+        />
+      )}
     </div>
   );
 };
