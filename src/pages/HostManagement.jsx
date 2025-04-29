@@ -24,10 +24,10 @@ const {
 } = HostManagementServices;
 
 const HostManagement = () => {
-  const [searchText, setSearchText] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
-  const [sortOrder, setSortOrder] = useState("");
-  const [page, setPage] = useState(1);
+  const [searchText, setSearchText] = useState();
+  const [statusFilter, setStatusFilter] = useState();
+  const [sortOrder, setSortOrder] = useState();
+  const [page, setPage] = useState();
 
   const queryClient = useQueryClient();
 
@@ -49,7 +49,6 @@ const HostManagement = () => {
     queryFn: () => processSearchHost(debouncedSearch),
     enabled: !!debouncedSearch,
   });
-  console.log(searchResults?.data);
   const { mutate: changeStatus } = useMutation({
     mutationFn: ({ id, status }) =>
       processChangeAccountStatus(id, { accountStatus: status }),
@@ -138,22 +137,25 @@ const HostManagement = () => {
     {
       title: "Identity Document",
       dataIndex: "identityDocument",
-      render: (identityDocument) => (
-        <div className="flex flex-col gap-2">
-          <Image
-            width={80}
-            src={`${baseUrl}${identityDocument?.frontSide}`}
-            alt="Front Side"
-            placeholder
-          />
-          <Image
-            width={80}
-            src={`${baseUrl}${identityDocument?.backSide}`}
-            alt="Back Side"
-            placeholder
-          />
-        </div>
-      ),
+      render: (identityDocument) =>
+        identityDocument ? (
+          <div className="flex flex-col gap-2">
+            <Image
+              width={80}
+              src={`${baseUrl}${identityDocument?.frontSide}`}
+              alt="Front Side"
+              placeholder
+            />
+            <Image
+              width={80}
+              src={`${baseUrl}${identityDocument?.backSide}`}
+              alt="Back Side"
+              placeholder
+            />
+          </div>
+        ) : (
+          <span>N/A</span>
+        ),
     },
     {
       title: "Actions",
@@ -229,7 +231,7 @@ const HostManagement = () => {
             debouncedSearch
               ? searchResults?.data
                 ? Array.isArray(searchResults.data)
-                  ? searchResults.data
+                  ? [searchResults.data]
                   : [searchResults.data]
                 : []
               : Array.isArray(usersData?.data)
