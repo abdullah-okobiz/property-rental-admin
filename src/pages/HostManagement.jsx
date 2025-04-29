@@ -1,22 +1,212 @@
-import React from "react";
+import { Table, Button, Select, Popconfirm, Input, Image } from "antd";
+import { DeleteOutlined, SearchOutlined } from "@ant-design/icons";
+import { useState } from "react";
+import HostManagementServices from "../services/hostManagement.services";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { AiOutlineClockCircle } from "react-icons/ai";
+const { Option } = Select;
+const {processGetAllHost,processChangeAccountStatus,processHostDelete}=HostManagementServices
 
 const HostManagement = () => {
-  return (
-      <div className="flex items-center justify-center min-h-screen px-4 bg-gray-50">
-        <div className="bg-white shadow-md rounded-2xl p-8 text-center max-w-md w-full border border-gray-100">
-          <AiOutlineClockCircle
-            size={64}
-            className="text-yellow-500 mb-4 mx-auto"
+  const [users] = useState([
+    {
+      _id: "680dd2a7f04e702efc3bbe9c",
+      avatar: null,
+      email: "somudrochowdhury08@gmail.com",
+      isVerified: true,
+      accountStatus: "active",
+      name: "jhon doe",
+      role: "host",
+      identityDocument: {
+        _id: "680dd7eeb58f1aa9d95d6111",
+        documentType: "nid",
+        frontSide:
+          "http://localhost:5000/api/v1/public/20240628_205927-1745737710942-.jpg",
+        backSide:
+          "http://localhost:5000/api/v1/public/PLP-NJ2022117-2-1745737710947-.jpg",
+      },
+      createdAt: "2025-04-27T06:45:59.226Z",
+      updatedAt: "2025-04-27T07:12:55.524Z",
+    },
+  ]);
+
+  const [searchText, setSearchText] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+  const [sortOrder, setSortOrder] = useState("new");
+
+  const handleAccountStatusChange = (value, userId) => {
+    console.log(`Change status of ${userId} to ${value}`);
+  };
+
+  const handleDeleteUser = (userId) => {
+    console.log(`Delete user ${userId}`);
+  };
+
+  const filteredUsers = users
+    .filter((user) => {
+      const matchesSearch =
+        user.name.toLowerCase().includes(searchText.toLowerCase()) ||
+        user.email.toLowerCase().includes(searchText.toLowerCase());
+
+      const matchesStatus = statusFilter
+        ? user.accountStatus === statusFilter
+        : true;
+
+      return matchesSearch && matchesStatus;
+    })
+    .sort((a, b) => {
+      if (sortOrder === "new") {
+        return new Date(b.createdAt) - new Date(a.createdAt);
+      } else {
+        return new Date(a.createdAt) - new Date(b.createdAt);
+      }
+    });
+
+  const columns = [
+    {
+      title: "SL",
+      render: (_, __, index) => index + 1,
+    },
+    {
+      title: "Avatar",
+      dataIndex: "avatar",
+      render: (avatar) =>
+        avatar ? (
+          <Image width={40} height={40} src={avatar} alt="avatar" />
+        ) : (
+          <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center">
+            N/A
+          </div>
+        ),
+    },
+    {
+      title: "Name",
+      dataIndex: "name",
+    },
+    {
+      title: "Email",
+      dataIndex: "email",
+    },
+    {
+      title: "Role",
+      dataIndex: "role",
+    },
+    {
+      title: "Verified",
+      dataIndex: "isVerified",
+      render: (isVerified) => (isVerified ? "Yes" : "No"),
+    },
+    {
+      title: "Account Status",
+      dataIndex: "accountStatus",
+      render: (status, record) => (
+        <Select
+          value={status}
+          onChange={(value) => handleAccountStatusChange(value, record._id)}
+          style={{ width: 120 }}
+        >
+          <Option value="active">Active</Option>
+          <Option value="inactive">Inactive</Option>
+          <Option value="pending">Pending</Option>
+          <Option value="suspended">Suspended</Option>
+          <Option value="rejected">Rejected</Option>
+        </Select>
+      ),
+    },
+    {
+      title: "Document Type",
+      dataIndex: ["identityDocument", "documentType"],
+      render: (type) => type?.toUpperCase() || "N/A",
+    },
+    {
+      title: "Identity Document",
+      dataIndex: "identityDocument",
+      render: (identityDocument) => (
+        <div className="flex flex-col gap-2">
+          <Image
+            width={80}
+            src={identityDocument?.frontSide}
+            alt="Front Side"
+            placeholder
           />
-          <h2 className="text-3xl font-bold mb-2 text-gray-800">Coming Soon</h2>
-          <p className="text-gray-500">
-            We're working hard to launch this page. Please check back later!
-          </p>
+          <Image
+            width={80}
+            src={identityDocument?.backSide}
+            alt="Back Side"
+            placeholder
+          />
         </div>
+      ),
+    },
+    {
+      title: "Actions",
+      render: (_, record) => (
+        <Popconfirm
+          title="Are you sure to delete this user?"
+          onConfirm={() => handleDeleteUser(record._id)}
+          okText="Yes"
+          cancelText="No"
+        >
+          <Button icon={<DeleteOutlined />} danger />
+        </Popconfirm>
+      ),
+    },
+  ];
+
+  return (
+    <div
+      className="w-full bg-white my-6 p-8 rounded-md overflow-y-auto"
+      style={{ maxHeight: "80vh" }}
+    >
+      <h1 className="text-2xl font-bold mb-4">User Management</h1>
+
+      <div className="flex flex-col md:flex-row gap-4 mb-6">
+        {/* Search Bar */}
+        <Input
+          placeholder="Search by name or email"
+          prefix={<SearchOutlined />}
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)}
+          allowClear
+          style={{ width: 250 }}
+        />
+
+        {/* Account Status Filter */}
+        <Select
+          placeholder="Filter by Status"
+          value={statusFilter}
+          onChange={(value) => setStatusFilter(value)}
+          allowClear
+          style={{ width: 180 }}
+        >
+          <Option value="active">Active</Option>
+          <Option value="inactive">Inactive</Option>
+          <Option value="pending">Pending</Option>
+          <Option value="suspended">Suspended</Option>
+          <Option value="rejected">Rejected</Option>
+        </Select>
+
+        {/* Sort By */}
+        <Select
+          placeholder="Sort By"
+          value={sortOrder}
+          onChange={(value) => setSortOrder(value)}
+          style={{ width: 150 }}
+        >
+          <Option value="new">New</Option>
+          <Option value="old">Old</Option>
+        </Select>
       </div>
-    );
+
+      <Table
+        dataSource={filteredUsers}
+        columns={columns}
+        rowKey="_id"
+        pagination={false}
+        scroll={{ x: "max-content" }}
+      />
+    </div>
+  );
 };
 
 export default HostManagement;
