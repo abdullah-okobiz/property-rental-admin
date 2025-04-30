@@ -5,6 +5,7 @@ const {
   addTeamMemberApi,
   editTeamMemberApi,
   deleteTeamMemberApi,
+  editTeamMemberFieldApi,
 } = TeamMemberApis;
 
 const TeamMemberServices = {
@@ -13,7 +14,8 @@ const TeamMemberServices = {
       const response = await getTeamMembersApi();
       return response?.data?.data;
     } catch (error) {
-      throw error;
+      if (error instanceof Error) throw error;
+      else throw new Error("Unknown error occurred in processGetTeamMembers");
     }
   },
 
@@ -22,7 +24,8 @@ const TeamMemberServices = {
       const response = await addTeamMemberApi(payload);
       return response?.data;
     } catch (error) {
-      throw error;
+      if (error instanceof Error) throw error;
+      else throw new Error("Unknown error occurred in processAddTeamMember");
     }
   },
 
@@ -31,16 +34,26 @@ const TeamMemberServices = {
       const response = await editTeamMemberApi(payload, id);
       return response?.data;
     } catch (error) {
-      throw error;
+      if (error instanceof Error) throw error;
+      else throw new Error("Unknown error occurred in processEditTeamMember");
     }
   },
-
+  processEditTeamMemberField: async (payload, id) => {
+    try {
+      const response = await editTeamMemberFieldApi(payload, id);
+      return response?.data;
+    } catch (error) {
+      if (error instanceof Error) throw error;
+      else throw new Error("Unknown error occurred in processEditTeamMember");
+    }
+  },
   processDeleteTeamMember: async (id) => {
     try {
       const response = await deleteTeamMemberApi(id);
       return response?.data;
     } catch (error) {
-      throw error;
+      if (error instanceof Error) throw error;
+      else throw new Error("Unknown error occurred in processDeleteTeamMember");
     }
   },
 };

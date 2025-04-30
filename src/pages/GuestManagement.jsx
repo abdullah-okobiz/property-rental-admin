@@ -40,10 +40,9 @@ const GuestManagement = () => {
     isFetching,
   } = useQuery({
     queryKey: ["guests", statusFilter, page, sortOrder],
-    queryFn: () =>
-      processGetAllGuest(statusFilter || "", page, sortOrder || ""),
+    queryFn: () => processGetAllGuest(statusFilter || "", page, sortOrder || ""),
     keepPreviousData: true,
-    enabled: !debouncedSearch, 
+    enabled: !debouncedSearch, // Disable if searching
   });
   const { data: searchResults, isLoading: searchLoading } = useQuery({
     queryKey: ["search-guests", debouncedSearch],
@@ -51,8 +50,11 @@ const GuestManagement = () => {
     enabled: !!debouncedSearch,
   });
   const { mutate: changeStatus } = useMutation({
-    mutationFn: ({ id, status }) =>
-      processChangeAccountStatus(id, { accountStatus: status }),
+    mutationFn: ({ id, status, identityDocument }) =>
+      processChangeAccountStatus(id, {
+        identityDocument,
+        accountStatus: status,
+      }),
     onSuccess: () => {
       message.success("Account status updated");
       queryClient.invalidateQueries(["guests"]);
@@ -73,8 +75,8 @@ const GuestManagement = () => {
     },
   });
 
-  const handleAccountStatusChange = (value, userId) => {
-    changeStatus({ id: userId, status: value });
+  const handleAccountStatusChange = (value, userId, identityDocument) => {
+    changeStatus({ id: userId, status: value, identityDocument });
   };
 
   const handleDeleteUser = (userId) => {
@@ -121,7 +123,13 @@ const GuestManagement = () => {
       render: (status, record) => (
         <Select
           value={status}
-          onChange={(value) => handleAccountStatusChange(value, record._id)}
+          onChange={(value) =>
+            handleAccountStatusChange(
+              value,
+              record._id,
+              record.identityDocument
+            )
+          }
           style={{ width: 120 }}
         >
           <Option value="rejected">Rejected</Option>

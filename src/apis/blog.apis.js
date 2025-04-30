@@ -21,6 +21,13 @@ const BlogApis = {
       },
     });
   },
+  editBlogFieldApi: (id, payload) => {
+    return axiosClient.patch(`/admin/blog/${id}`, payload, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+  },
   deleteBlogApi: (id) => {
     return axiosClient.delete(`/admin/blog/${id}`);
   },

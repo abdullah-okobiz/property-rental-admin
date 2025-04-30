@@ -54,7 +54,6 @@ const YouTubeEmbed = ({ url }) => {
 // Integrated Description Component
 const Description = ({ content }) => {
   if (!content) return <span>No description available</span>;
-  console.log(content);
   return <div dangerouslySetInnerHTML={{ __html: content }} />;
 };
 

@@ -20,7 +20,13 @@ const teamMemberApis = {
       },
     });
   },
-
+  editTeamMemberFieldApi: (payload, id) => {
+    return axiosClient.patch(`/admin/team/${id}`, payload, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+  },
   deleteTeamMemberApi: (id) => {
     return axiosClient.delete(`/admin/team/${id}`);
   },
