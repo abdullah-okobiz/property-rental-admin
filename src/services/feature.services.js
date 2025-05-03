@@ -9,15 +9,23 @@ const FeatureServices = {
       const response = await getFeaturesApi();
       return response?.data;
     } catch (error) {
-      throw error;
+      if (error instanceof Error) {
+        throw error;
+      } else {
+        throw new Error("Unknown Error Occurred In Process Get Feature ");
+      }
     }
   },
-  processrAddFeature: async (payload) => {
+  processAddFeature: async (payload) => {
     try {
       const response = await addFeatureApi(payload);
       return response?.data;
     } catch (error) {
-      throw error;
+      if (error instanceof Error) {
+        throw error;
+      } else {
+        throw new Error("Unknown Error Occurred In Process Add Feature ");
+      }
     }
   },
   processEditFeature: async (payload, id) => {
@@ -25,15 +33,23 @@ const FeatureServices = {
       const response = await editFeatureApi(payload, id);
       return response?.data;
     } catch (error) {
-      throw error;
+      if (error instanceof Error) {
+        throw error;
+      } else {
+        throw new Error("Unknown Error Occurred In Process Edit Feature ");
+      }
     }
   },
-  processDeleteFeature: async ( id) => {
+  processDeleteFeature: async (id) => {
     try {
-      const response = await deleteFeatureApi( id);
+      const response = await deleteFeatureApi(id);
       return response?.data;
     } catch (error) {
-      throw error;
+      if (error instanceof Error) {
+        throw error;
+      } else {
+        throw new Error("Unknown Error Occurred In Process Delete Feature ");
+      }
     }
   },
 };

@@ -4,29 +4,40 @@ const { addCategoryApi, getCategoryApi, editCategoryApi, deleteCategoryApi } =
   CategoryApis;
 
 const CategoryServices = {
-  processGetCategory: async () => {
+  processGetCategory: async (payload) => {
     try {
-      const response = await getCategoryApi();
+      const response = await getCategoryApi(payload);
       return response?.data;
     } catch (error) {
-      throw error;
+      if (error instanceof Error) {
+        throw error;
+      } else {
+        throw new Error("Unknown Error Occurred In Process Get Category");
+      }
     }
   },
-  processrAddCategory: async (payload) => {
+  processAddCategory: async (payload) => {
     try {
       const response = await addCategoryApi(payload);
       return response?.data;
     } catch (error) {
-      throw error;
+      if (error instanceof Error) {
+        throw error;
+      } else {
+        throw new Error("Unknown Error Occurred In Process Add Category");
+      }
     }
   },
   processEditCategory: async (id, payload) => {
     try {
-      console.log(id, payload);
       const response = await editCategoryApi(id, payload);
       return response?.data;
     } catch (error) {
-      throw error;
+      if (error instanceof Error) {
+        throw error;
+      } else {
+        throw new Error("Unknown Error Occurred In Process Edit Category");
+      }
     }
   },
   processDeleteCategory: async (id) => {
@@ -34,7 +45,11 @@ const CategoryServices = {
       const response = await deleteCategoryApi(id);
       return response?.data;
     } catch (error) {
-      throw error;
+      if (error instanceof Error) {
+        throw error;
+      } else {
+        throw new Error("Unknown Error Occurred In Process Delete Category");
+      }
     }
   },
 };

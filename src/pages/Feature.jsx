@@ -10,7 +10,7 @@ import FeatureServices from "../services/feature.services";
 
 const {
   processGetFeature,
-  processrAddFeature,
+  processAddFeature,
   processDeleteFeature,
   processEditFeature,
 } = FeatureServices;
@@ -23,11 +23,7 @@ const Feature = () => {
   const queryClient = useQueryClient();
 
   // Fetch features
-  const {
-    data: responseData,
-    isPending,
-    error,
-  } = useQuery({
+  const { data: responseData, isPending } = useQuery({
     queryKey: ["features"],
     queryFn: processGetFeature,
   });
@@ -36,7 +32,7 @@ const Feature = () => {
 
   // Add feature
   const { mutate: addFeature, isPending: isAdding } = useMutation({
-    mutationFn: processrAddFeature,
+    mutationFn: processAddFeature,
     onSuccess: () => {
       message.success("Feature added successfully");
       queryClient.invalidateQueries({ queryKey: ["features"] });

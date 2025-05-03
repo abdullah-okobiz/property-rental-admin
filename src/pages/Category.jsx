@@ -1,3 +1,16 @@
+import { useEffect, useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import CategoryServices from "../services/category.services";
+import FeatureServices from "../services/feature.services";
+const {
+  processDeleteCategory,
+  processEditCategory,
+  processGetCategory,
+  processAddCategory,
+} = CategoryServices;
+
+const { processGetFeature } = FeatureServices;
+
 import {
   Button,
   Form,
@@ -6,6 +19,7 @@ import {
   Popconfirm,
   Select,
   Table,
+  Tabs,
   message,
 } from "antd";
 import {
@@ -13,78 +27,61 @@ import {
   DeleteOutlined,
   PlusSquareOutlined,
 } from "@ant-design/icons";
-import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-
-import CategoryServices from "../services/category.services";
-import FeatureServices from "../services/feature.services";
-
-const {
-  processDeleteCategory,
-  processEditCategory,
-  processGetCategory,
-  processrAddCategory,
-} = CategoryServices;
-
-const { processGetFeature } = FeatureServices;
 
 const Category = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [form] = Form.useForm();
   const [editingCategory, setEditingCategory] = useState(null);
-
+  const [form] = Form.useForm();
+  const [activeFeatureId, setActiveFeatureId] = useState(null);
   const queryClient = useQueryClient();
 
-  // Fetch categories
-  const { data: categoryRes, isLoading } = useQuery({
-    queryKey: ["categories"],
-    queryFn: processGetCategory,
-  });
-  const categories = categoryRes?.data || [];
-
-  // Fetch features
-  const { data: featureRes } = useQuery({
+  // Fetch all features
+  const { data: featuresData, isLoading: featuresLoading } = useQuery({
     queryKey: ["features"],
     queryFn: processGetFeature,
   });
-  const features = featureRes?.data || [];
 
-  // Add category
-  const { mutate: addCategory, isPending: isAdding } = useMutation({
-    mutationFn: processrAddCategory,
+  // Fetch categories for the selected feature
+  const { data: categoryData, isLoading: categoryLoading } = useQuery({
+    queryKey: ["categories", activeFeatureId],
+    queryFn: () => processGetCategory(activeFeatureId),
+    enabled: !!activeFeatureId,
+  });
+
+  const categories = categoryData?.data || [];
+
+  // --- Mutations ---
+  const addCategoryMutation = useMutation({
+    mutationFn: processAddCategory,
     onSuccess: () => {
       message.success("Category added successfully");
-      queryClient.invalidateQueries({ queryKey: ["categories"] });
-      handleModalCancel();
+      queryClient.invalidateQueries({
+        queryKey: ["categories", activeFeatureId],
+      });
     },
-    onError: () => {
-      message.error("Failed to add category");
-    },
+    onError: () => message.error("Failed to add category"),
   });
 
-  // Edit category
-  const { mutate: editCategory, isPending: isEditing } = useMutation({
-    mutationFn: ({ id, data }) => processEditCategory(id, data),
+  const editCategoryMutation = useMutation({
+    mutationFn: ({ id, payload }) => processEditCategory(id, payload),
     onSuccess: () => {
       message.success("Category updated successfully");
-      queryClient.invalidateQueries({ queryKey: ["categories"] });
-      handleModalCancel();
+      queryClient.invalidateQueries({
+        queryKey: ["categories", activeFeatureId],
+      });
     },
-    onError: () => {
-      message.error("Failed to update category");
-    },
+    onError: () => message.error("Failed to update category"),
   });
 
-  // Delete category
-  const { mutate: deleteCategory, isPending: isDeleting } = useMutation({
-    mutationFn: (id) => processDeleteCategory(id),
+  const deleteCategoryMutation = useMutation({
+    mutationFn: processDeleteCategory,
     onSuccess: () => {
-      message.success("Category deleted successfully");
-      queryClient.invalidateQueries({ queryKey: ["categories"] });
+      message.success("Category deleted");
+      queryClient.invalidateQueries({
+        queryKey: ["categories", activeFeatureId],
+      });
     },
-    onError: () => {
-      message.error("Failed to delete category");
-    },
+    onError: () => message.error("Failed to delete category"),
   });
 
   const handleModalCancel = () => {
@@ -94,11 +91,18 @@ const Category = () => {
   };
 
   const handleFormFinish = (values) => {
+    const payload = {
+      categoryName: values.categoryName,
+      feature: [values.feature], // backend expects array
+    };
+
     if (editingCategory) {
-      editCategory({ id: editingCategory._id, data: values });
+      editCategoryMutation.mutate({ id: editingCategory._id, payload });
     } else {
-      addCategory(values);
+      addCategoryMutation.mutate(payload);
     }
+
+    handleModalCancel();
   };
 
   const handleEdit = (record) => {
@@ -106,8 +110,12 @@ const Category = () => {
     setIsModalVisible(true);
     form.setFieldsValue({
       categoryName: record.categoryName,
-      feature: record.feature,
+      feature: record.feature[0], // assuming one feature
     });
+  };
+
+  const handleDelete = (id) => {
+    deleteCategoryMutation.mutate(id);
   };
 
   const columns = [
@@ -120,9 +128,13 @@ const Category = () => {
       title: "Feature",
       dataIndex: "feature",
       key: "feature",
-      render: (featureId) => {
-        const matched = features.find((f) => f._id === featureId);
-        return matched ? matched.featureName : "Unknown";
+      render: (featureIds) => {
+        const names = featureIds
+          .map(
+            (id) => featuresData?.data?.find((f) => f._id === id)?.featureName
+          )
+          .filter(Boolean);
+        return names.join(", ") || "Unknown";
       },
     },
     {
@@ -137,7 +149,7 @@ const Category = () => {
           />
           <Popconfirm
             title="Are you sure to delete this category?"
-            onConfirm={() => deleteCategory(record._id)}
+            onConfirm={() => handleDelete(record._id)}
             okText="Yes"
             cancelText="No"
           >
@@ -147,7 +159,11 @@ const Category = () => {
       ),
     },
   ];
-
+  useEffect(() => {
+    if (!activeFeatureId && featuresData?.data?.length > 0) {
+      setActiveFeatureId(featuresData.data[0]._id);
+    }
+  }, [featuresData, activeFeatureId]);
   return (
     <div className="w-full bg-white my-6 p-8 rounded-md">
       <div className="flex justify-between mb-4">
@@ -159,18 +175,34 @@ const Category = () => {
             setEditingCategory(null);
             setIsModalVisible(true);
           }}
+          disabled={!activeFeatureId}
         >
           <PlusSquareOutlined /> Add New
         </Button>
       </div>
 
-      <Table
-        dataSource={categories}
-        columns={columns}
-        rowKey="_id"
-        loading={isLoading || isDeleting}
-        scroll={{ x: "max-content" }}
+      <Tabs
+        activeKey={activeFeatureId || ""}
+        onChange={(key) => setActiveFeatureId(key)}
+        items={
+          featuresData?.data?.map((feature) => ({
+            label: feature.featureName,
+            key: feature._id,
+          })) || []
+        }
       />
+
+      <div className="categoryTable">
+        <Table
+          dataSource={categories}
+          columns={columns}
+          loading={categoryLoading}
+          rowKey="_id"
+          scroll={{ x: "max-content" }}
+          className="mt-4 categoryTable"
+          pagination={false}
+        />
+      </div>
 
       <Modal
         title={editingCategory ? "Edit Category" : "Create Category"}
@@ -192,8 +224,8 @@ const Category = () => {
             label="Feature"
             rules={[{ required: true, message: "Please select a feature" }]}
           >
-            <Select placeholder="Select a feature" loading={!features.length}>
-              {features.map((feature) => (
+            <Select placeholder="Select a feature" loading={featuresLoading}>
+              {featuresData?.data?.map((feature) => (
                 <Select.Option key={feature._id} value={feature._id}>
                   {feature.featureName}
                 </Select.Option>
@@ -204,7 +236,9 @@ const Category = () => {
           <Button
             className="custom-button"
             htmlType="submit"
-            loading={isAdding || isEditing}
+            loading={
+              addCategoryMutation.isPending || editCategoryMutation.isPending
+            }
           >
             {editingCategory ? "Update" : "Create"}
           </Button>

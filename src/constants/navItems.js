@@ -4,6 +4,11 @@ import {
   FaUserFriends,
   FaBlog,
   FaMoneyCheckAlt,
+  FaList,
+  FaHome,
+  FaBuilding,
+  FaTree,
+  FaCogs,
 } from "react-icons/fa";
 import {
   FiStar,
@@ -24,6 +29,16 @@ export const menuItems = [
   { key: "dashboard", label: "Dashboard", icon: FaTachometerAlt },
   { key: "host-management", label: "Host Management", icon: FaUserShield },
   { key: "guest-management", label: "Guest Management", icon: FaUserFriends },
+  {
+    key: "listings",
+    label: "Listing",
+    icon: FaList,
+    children: [
+      { key: "rent", label: "Rents", icon: FaHome },
+      { key: "flat", label: "Flat", icon: FaBuilding },
+      { key: "land", label: "Land", icon: FaTree },
+    ],
+  },
   { key: "contact_us", label: "Contact Us", icon: FiPhoneCall },
   { key: "payment", label: "Payment", icon: FaMoneyCheckAlt },
   {
@@ -45,6 +60,7 @@ export const menuItems = [
       { key: "why_choose_us", label: "Why Choose Us", icon: FiThumbsUp },
       { key: "partners", label: "Partners", icon: FiBriefcase },
       { key: "about_us", label: "About Us", icon: FiInfo },
+      { key: "amenities", label: "Amenities", icon: FaCogs },
       { key: "blog-management", label: "Blog", icon: FaBlog },
     ],
   },

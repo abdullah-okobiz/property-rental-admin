@@ -19,6 +19,10 @@ import AboutUs from "../pages/AboutUs";
 import Partners from "../pages/Partners";
 import WhyChooseUs from "../pages/WhyChooseUs";
 import ContactUs from "../pages/ContactUs";
+import Land from "../pages/Land";
+import Flat from "../pages/Flat";
+import Rent from "../pages/Rent";
+import Amenities from "../pages/Amenities";
 
 const Routes = createBrowserRouter([
   {
@@ -53,6 +57,10 @@ const Routes = createBrowserRouter([
       { path: "/partners", element: <Partners /> },
       { path: "/why_choose_us", element: <WhyChooseUs /> },
       { path: "/contact_us", element: <ContactUs /> },
+      { path: "/land", element: <Land /> },
+      { path: "/flat", element: <Flat /> },
+      { path: "/rent", element: <Rent /> },
+      { path: "/amenities", element: <Amenities /> },
     ],
   },
 ]);
