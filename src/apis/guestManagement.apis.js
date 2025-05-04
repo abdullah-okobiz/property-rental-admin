@@ -1,9 +1,9 @@
 import axiosClient from "../configs/axios.config";
 
 const GuestManagementApis = {
-  getAllGuests: (accountStaus, page, sort) => {
+  getAllGuests: (accountStatus, page, sort) => {
     return axiosClient.get(
-      `/admin/users?role=guest&accountStatus=${accountStaus}&sort=${sort}&page=${page}`
+      `/admin/users?role=guest&accountStatus=${accountStatus}&sort=${sort}&page=${page}`
     );
   },
   changeAccountStatus: (id, payload) => {
