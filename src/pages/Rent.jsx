@@ -176,7 +176,11 @@ const Rent = () => {
         <Input
           placeholder="Search by host email"
           prefix={<SearchOutlined />}
-          defaultValue={searchText}
+          value={searchText}
+          onChange={(e) => {
+            setSearchText(e.target.value);
+            setPage(1);
+          }}
           onPressEnter={(e) => {
             setSearchText(e.target.value);
             setPage(1); // Reset to first page on new search
