@@ -40,7 +40,8 @@ const Main = () => {
                 : `w-[110px] h-[100px] leading-[110px]`
             }`}
           >
-            <img src={logo} alt="Logo" />
+            {/* <img src={logo} alt="Logo" /> */}
+            {/* <h1 className="font-bold text-amber-400">HomezyStay</h1> */}
           </div>
           <Menu
             theme="light"

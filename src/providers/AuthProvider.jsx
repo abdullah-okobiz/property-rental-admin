@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
-import AuthContext from "../contexts/authContext";
+
 import { jwtDecode } from "jwt-decode";
 import AuthServices from "../services/auth.services";
+import AuthContext from "../contexts/AuthContext";
 const { processrRefreshToken } = AuthServices;
 
 const AuthProvider = ({ children }) => {
@@ -43,7 +44,8 @@ const AuthProvider = ({ children }) => {
       const decoded = jwtDecode(accessToken);
       setUser(decoded);
       setIsAuthenticated(true);
-    } catch (err) {
+    } catch (error) {
+      console.log(error);
       logout();
     }
   };
@@ -53,7 +55,9 @@ const AuthProvider = ({ children }) => {
     setIsAuthenticated(false);
   };
   return (
-    <AuthContext.Provider value={{ user, setUser, login, isAuthenticated }}>
+    <AuthContext.Provider
+      value={{ user, setUser, login, isAuthenticated, logout, refreshToken }}
+    >
       {children}
     </AuthContext.Provider>
   );

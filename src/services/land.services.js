@@ -1,16 +1,16 @@
-import FlatApis from "../apis/flat.apis";
+import LandApis from "../apis/land.apis";
 
-const { changeStatus, deleteOne, findAllFlats } = FlatApis;
-const FlatServices = {
+const { changeStatus, deleteOne, findAllLands } = LandApis;
+const LandServices = {
   processGetAll: async ({ page, status, sort, search, isSold }) => {
     try {
-      const data = await findAllFlats({ page, status, sort, search, isSold });
+      const data = await findAllLands({ page, status, sort, search, isSold });
       return data?.data;
     } catch (error) {
       if (error instanceof Error) {
         throw error;
       } else {
-        throw new Error("Unknown Error Occurred In Process Get Flats ");
+        throw new Error("Unknown Error Occurred In Process Get Lands ");
       }
     }
   },
@@ -41,4 +41,4 @@ const FlatServices = {
   },
 };
 
-export default FlatServices;
+export default LandServices;

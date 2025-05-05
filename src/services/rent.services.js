@@ -5,7 +5,7 @@ const RentServices = {
   processGetAll: async ({ page, status, sort, search }) => {
     try {
       const data = await findAllRents({ page, status, sort, search });
-      return data?.data?.data;
+      return data?.data;
     } catch (error) {
       if (error instanceof Error) {
         throw error;

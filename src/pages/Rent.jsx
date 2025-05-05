@@ -45,6 +45,7 @@ const Rent = () => {
       }),
     keepPreviousData: true,
   });
+  console.log(data);
   const changeStatusMutation = useMutation({
     mutationFn: ({ id, payload }) => processChangeStatus({ id, payload }),
     onSuccess: () => {
@@ -78,7 +79,6 @@ const Rent = () => {
       title: "Host",
       render: (_, record) => (
         <div className="text-sm space-y-1">
-          <>{console.log(record)}</>
           <div className="flex justify-between">
             <span className="text-gray-500 font-medium">Name:</span>
             <span>{record?.host?.name}</span>
@@ -217,16 +217,16 @@ const Rent = () => {
           <Option value={-1}>Old</Option>
         </Select>
       </div>
-
+      {console.log(data?.totalRents)}
       <Table
-        dataSource={data || []}
+        dataSource={data?.data || []}
         loading={isLoading}
         columns={columns}
         rowKey="_id"
         pagination={{
           current: page,
-          pageSize: 10,
-          total: data?.total || 0,
+          pageSize: 9,
+          total: data?.totalRents || 0,
           onChange: (p) => setPage(p),
         }}
         scroll={{ x: "max-content" }}

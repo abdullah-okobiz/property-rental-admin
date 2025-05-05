@@ -235,14 +235,14 @@ const Flat = () => {
       </div>
 
       <Table
-        dataSource={data || []}
+        dataSource={data?.data || []}
         loading={isLoading}
         columns={columns}
         rowKey="_id"
         pagination={{
           current: page,
-          pageSize: 10,
-          total: data?.total || 0,
+          pageSize: 9,
+          total: data?.totalFlat || 0,
           onChange: (p) => setPage(p),
         }}
         scroll={{ x: "max-content" }}
