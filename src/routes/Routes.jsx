@@ -8,7 +8,7 @@ import Payment from "../pages/Payment";
 import GuestManagement from "../pages/GuestManagement";
 import HostManagement from "../pages/HostManagement";
 import BlogManagement from "../pages/BlogManagement";
-import ControllPanel from "../pages/ControllPanel";
+import StaffManagement from "../pages/StaffManagement";
 import Feature from "../pages/Feature";
 import Category from "../pages/Category";
 import Faq from "../pages/Faq";
@@ -46,7 +46,7 @@ const Routes = createBrowserRouter([
       { path: "/guest-management", element: <GuestManagement /> },
       { path: "/host-management", element: <HostManagement /> },
       { path: "/blog-management", element: <BlogManagement /> },
-      { path: "/control-panel", element: <ControllPanel /> },
+      { path: "/staff-management", element: <StaffManagement /> },
       { path: "/feature", element: <Feature /> },
       { path: "/category", element: <Category /> },
       { path: "/faq", element: <Faq /> },

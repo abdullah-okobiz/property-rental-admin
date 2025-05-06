@@ -42,8 +42,8 @@ export const menuItems = [
   { key: "contact_us", label: "Contact Us", icon: FiPhoneCall },
   { key: "payment", label: "Payment", icon: FaMoneyCheckAlt },
   {
-    key: "control-panel",
-    label: "Control Panel",
+    key: "staff-management",
+    label: "Staff Management",
     icon: MdSettingsApplications,
   },
   {
