@@ -4,6 +4,9 @@ const AuthApis = {
   loginApi: (payload) => {
     return axiosClient.post("/admin/login", payload);
   },
+  logoutApi: () => {
+    return axiosClient.post("/logout");
+  },
   refreshTokenApi: () => {
     return axiosClient.post("/refresh");
   },

@@ -142,7 +142,7 @@ const Routes = createBrowserRouter([
       {
         path: "/host-management",
         element: (
-          <RoleProtected allowedRoles={["admin", "listingVerificationManager"]}>
+          <RoleProtected allowedRoles={["admin", "accountAdministrator"]}>
             <HostManagement />
           </RoleProtected>
         ),

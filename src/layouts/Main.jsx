@@ -9,8 +9,24 @@ import React, { useState } from "react";
 import { menuItems } from "../constants/navItems";
 import RenderdMenuItems from "../components/RenderedMenuItems";
 import { getFirstLetters } from "../utils/getFirstLetters";
+import AuthServices from "../services/auth.services";
+import { useMutation } from "@tanstack/react-query";
+const { processLogout } = AuthServices;
 
 const Main = () => {
+  const { mutate: logout } = useMutation({
+    mutationFn: processLogout,
+    onSuccess: () => {
+      message.success("Logout Successful");
+      localStorage.removeItem("accessToken");
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+    },
+    onError: (error) => {
+      message.error(error?.response?.data?.message || "Logout failed");
+    },
+  });
   const navigate = useNavigate();
   const [selectedMenuItem, setSelectedMenuItem] = useState(
     localStorage.getItem("selectedMenuItem") || "summary"
@@ -20,7 +36,7 @@ const Main = () => {
     localStorage.setItem("selectedMenuItem", key);
     key === "dashboard" ? navigate("/") : navigate(`/${key}`);
   };
-  const [hideLayout, setHideLayout] = useState(false);
+  const [hideLayout] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
   return (
     <Layout hasSider className="">
@@ -40,8 +56,7 @@ const Main = () => {
                 : `w-[110px] h-[100px] leading-[110px]`
             }`}
           >
-            {/* <img src={logo} alt="Logo" /> */}
-            {/* <h1 className="font-bold text-amber-400">HomezyStay</h1> */}
+            <img src={logo} alt="Logo" />
           </div>
           <Menu
             theme="light"
@@ -60,7 +75,7 @@ const Main = () => {
         <Header className="w-full flex justify-between mx-0 px-0 items-center bg-secondary">
           <div
             onClick={() => setCollapsed(!collapsed)}
-            className="px-4 text-black hover:text-black/70 bg-secondary hover:bg-secondary/70 cursor-pointer"
+            className="px-4 text-white hover:text-gray-200 bg-secondary hover:bg-secondary/70 cursor-pointer"
           >
             {collapsed ? (
               <MenuUnfoldOutlined className="text-xl" />
@@ -69,11 +84,14 @@ const Main = () => {
             )}
           </div>
           <div className="flex items-center justify-center gap-2">
-            <Avatar size="large" className="bg-primary">
+            {/* <Avatar size="large" className="bg-primary">
               {getFirstLetters("hb")}
-            </Avatar>
+            </Avatar> */}
 
-            <div className="px-4 cursor-pointer font-medium mr-6 text-black hover:text-black/70">
+            <div
+              className="px-4 cursor-pointer font-medium mr-6 text-white hover:text-gray-200"
+              onClick={logout}
+            >
               <IoMdLogOut size={30} />
             </div>
           </div>
