@@ -9,8 +9,11 @@ const StaffManagementApis = {
       `/admin/staff?page=${page}&role=${role}&search=${search}`
     );
   },
-  changeStaffField: ({ id, payload }) => {
-    return axiosClient.patch(`/admin/staff/${id}`, payload);
+  changeStaffPassword: ({ id, payload }) => {
+    return axiosClient.patch(`/admin/staff/password/${id}`, payload);
+  },
+  changeStaffRole: ({ id, payload }) => {
+    return axiosClient.patch(`/admin/staff/role/${id}`, payload);
   },
   deleteStaff: ({ id }) => {
     return axiosClient.delete(`/admin/staff/${id}`);

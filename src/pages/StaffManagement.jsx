@@ -22,7 +22,8 @@ import StaffManagementServices from "../services/staff.services";
 import useDebounce from "../hooks/useDebounce";
 
 const {
-  processChangeStaffField,
+  processChangeStaffPassword,
+  processChangeStaffRole,
   processCreateStaff,
   processDeleteStaff,
   processFindAllStaff,
@@ -71,21 +72,33 @@ const StaffManagement = () => {
       setIsCreateModalOpen(false);
       queryClient.invalidateQueries(["staffs"]);
     },
-    onError: () => {
-      message.error("Failed to create staff");
+    onError: (error) => {
+      message.error(error?.response?.data?.message);
     },
   });
 
-  const { mutate: changeField } = useMutation({
-    mutationFn: ({ id, payload }) => processChangeStaffField({ id, payload }),
+  const { mutate: changeRole } = useMutation({
+    mutationFn: ({ id, payload }) => processChangeStaffRole({ id, payload }),
     onSuccess: () => {
-      message.success("Updated successfully");
+      message.success("Role updated");
+      queryClient.invalidateQueries(["staffs"]);
+    },
+    onError: (error) => {
+      message.error(error?.response?.data?.message);
+    },
+  });
+
+  const { mutate: changePassword } = useMutation({
+    mutationFn: ({ id, payload }) =>
+      processChangeStaffPassword({ id, payload }),
+    onSuccess: () => {
+      message.success("Password updated");
       passwordForm.resetFields();
       setIsPasswordModalOpen(false);
       queryClient.invalidateQueries(["staffs"]);
     },
-    onError: () => {
-      message.error("Update failed");
+    onError: (error) => {
+      message.error(error?.response?.data?.message);
     },
   });
 
@@ -95,8 +108,8 @@ const StaffManagement = () => {
       message.success("Staff deleted");
       queryClient.invalidateQueries(["staffs"]);
     },
-    onError: () => {
-      message.error("Failed to delete staff");
+    onError: (error) => {
+      message.error(error?.response?.data?.message);
     },
   });
 
@@ -120,7 +133,7 @@ const StaffManagement = () => {
         <Select
           value={role}
           onChange={(value) =>
-            changeField({ id: record._id, payload: { role: value } })
+            changeRole({ id: record._id, payload: { role: value } })
           }
           style={{ width: 200 }}
         >
@@ -254,7 +267,7 @@ const StaffManagement = () => {
         onCancel={() => setIsPasswordModalOpen(false)}
         onOk={() =>
           passwordForm.validateFields().then(({ password }) => {
-            changeField({
+            changePassword({
               id: selectedStaffId,
               payload: { password },
             });

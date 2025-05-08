@@ -1,7 +1,12 @@
 import StaffManagementApis from "../apis/staff.apis";
 
-const { changeStaffField, deleteStaff, findAllStaffs, createStaff } =
-  StaffManagementApis;
+const {
+  changeStaffPassword,
+  changeStaffRole,
+  deleteStaff,
+  findAllStaffs,
+  createStaff,
+} = StaffManagementApis;
 const StaffManagementServices = {
   processCreateStaff: async ({ payload }) => {
     try {
@@ -27,15 +32,31 @@ const StaffManagementServices = {
       }
     }
   },
-  processChangeStaffField: async ({ id, payload }) => {
+  processChangeStaffPassword: async ({ id, payload }) => {
+    console.log("password ==== id , payload", { id, payload });
     try {
-      const data = await changeStaffField({ id, payload });
+      const data = await changeStaffPassword({ id, payload });
       return data?.data;
     } catch (error) {
       if (error instanceof Error) {
         throw error;
       } else {
-        throw new Error("Unknown Error Occurred In Staff Field Change Service");
+        throw new Error(
+          "Unknown Error Occurred In Staff password Change Service"
+        );
+      }
+    }
+  },
+  processChangeStaffRole: async ({ id, payload }) => {
+    console.log("role ==== id , payload", { id, payload });
+    try {
+      const data = await changeStaffRole({ id, payload });
+      return data?.data;
+    } catch (error) {
+      if (error instanceof Error) {
+        throw error;
+      } else {
+        throw new Error("Unknown Error Occurred In Staff Role Change Service");
       }
     }
   },
