@@ -1,6 +1,7 @@
 import {
   Button,
   Form,
+  Image,
   Input,
   Modal,
   Popconfirm,
@@ -161,7 +162,7 @@ const Amenities = () => {
       dataIndex: "amenitiesImage",
       key: "amenitiesImage",
       render: (url) => (
-        <img
+        <Image
           src={`${baseUrl}${url}`}
           alt="Amenity"
           style={{ width: 50, height: 50 }}

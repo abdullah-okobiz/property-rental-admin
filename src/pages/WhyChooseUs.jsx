@@ -1,19 +1,32 @@
-import { Button, Form, Input, Modal, Popconfirm, Table, message } from "antd";
+import {
+  Button,
+  Form,
+  Input,
+  Modal,
+  Popconfirm,
+  Table,
+  Upload,
+  message,
+  Image,
+} from "antd";
 import {
   EditOutlined,
   DeleteOutlined,
   PlusSquareOutlined,
+  UploadOutlined,
 } from "@ant-design/icons";
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { truncateText } from "../utils/truncateText";
 import WhyChooseUsServices from "../services/whyChooseUs.services";
+import { baseUrl } from "../constants/env";
 
 const {
   processAddWhyChooseUs,
   processDeleteWhyChooseUs,
   processEditWhyChooseUs,
   processGetWhyChooseUs,
+  processEditWhyChooseUsField,
 } = WhyChooseUsServices;
 
 const WhyChooseUs = () => {
@@ -21,6 +34,7 @@ const WhyChooseUs = () => {
   const [form] = Form.useForm();
   const [editingItem, setEditingItem] = useState(null);
   const [expandedRows, setExpandedRows] = useState({});
+  const [fileList, setFileList] = useState([]);
   const queryClient = useQueryClient();
 
   const { data: res, isPending } = useQuery({
@@ -54,6 +68,18 @@ const WhyChooseUs = () => {
     },
   });
 
+  const { mutate: editItemField } = useMutation({
+    mutationFn: ({ id, payload }) => processEditWhyChooseUsField(id, payload),
+    onSuccess: () => {
+      message.success("Updated successfully");
+      queryClient.invalidateQueries({ queryKey: ["whyChooseUs"] });
+      handleModalCancel();
+    },
+    onError: () => {
+      message.error("Failed to update");
+    },
+  });
+
   const { mutate: deleteItem, isPending: isDeleting } = useMutation({
     mutationFn: processDeleteWhyChooseUs,
     onSuccess: () => {
@@ -68,16 +94,45 @@ const WhyChooseUs = () => {
   const handleModalCancel = () => {
     setIsModalVisible(false);
     form.resetFields();
+    setFileList([]);
     setEditingItem(null);
   };
 
   const handleFormFinish = async () => {
     try {
       const values = await form.validateFields();
+      const isImageUpdated = fileList.length > 0 && fileList[0].originFileObj;
+
       if (editingItem) {
-        editItem({ id: editingItem._id, payload: values });
+        if (isImageUpdated) {
+          const formData = new FormData();
+          formData.append("whyChooseUsTitle", values.whyChooseUsTitle);
+          formData.append(
+            "whyChooseUsDescription",
+            values.whyChooseUsDescription
+          );
+          formData.append("whyChooseUsIcon", fileList[0].originFileObj);
+          editItem({ id: editingItem._id, payload: formData });
+        } else {
+          editItemField({
+            id: editingItem._id,
+            payload: {
+              whyChooseUsTitle: values.whyChooseUsTitle,
+              whyChooseUsDescription: values.whyChooseUsDescription,
+            },
+          });
+        }
       } else {
-        addItem(values);
+        const formData = new FormData();
+        formData.append("whyChooseUsTitle", values.whyChooseUsTitle);
+        formData.append(
+          "whyChooseUsDescription",
+          values.whyChooseUsDescription
+        );
+        if (isImageUpdated) {
+          formData.append("whyChooseUsIcon", fileList[0].originFileObj);
+        }
+        addItem(formData);
       }
     } catch (error) {
       console.error("Validation Error:", error);
@@ -90,6 +145,7 @@ const WhyChooseUs = () => {
       whyChooseUsTitle: record.whyChooseUsTitle,
       whyChooseUsDescription: record.whyChooseUsDescription,
     });
+    setFileList([]);
     setIsModalVisible(true);
   };
 
@@ -137,6 +193,23 @@ const WhyChooseUs = () => {
       },
     },
     {
+      title: "Icon",
+      dataIndex: "whyChooseUsIcon",
+      key: "whyChooseUsIcon",
+      render: (src) =>
+        src ? (
+          <Image
+            src={baseUrl + src}
+            alt="icon"
+            width={50}
+            height={50}
+            style={{ objectFit: "cover" }}
+          />
+        ) : (
+          "N/A"
+        ),
+    },
+    {
       title: "Actions",
       key: "actions",
       render: (_, record) => (
@@ -167,6 +240,7 @@ const WhyChooseUs = () => {
           className="custom-button"
           onClick={() => {
             form.resetFields();
+            setFileList([]);
             setEditingItem(null);
             setIsModalVisible(true);
           }}
@@ -204,6 +278,24 @@ const WhyChooseUs = () => {
             rules={[{ required: true, message: "Please enter a description" }]}
           >
             <Input.TextArea rows={4} />
+          </Form.Item>
+
+          <Form.Item label="Icon">
+            <Upload
+              beforeUpload={() => false}
+              fileList={fileList}
+              onChange={({ fileList }) => setFileList(fileList)}
+              onRemove={(file) => {
+                setFileList((prev) =>
+                  prev.filter((item) => item.uid !== file.uid)
+                );
+                return false;
+              }}
+              maxCount={1}
+              listType="picture"
+            >
+              <Button icon={<UploadOutlined />}>Select Image</Button>
+            </Upload>
           </Form.Item>
 
           <Button

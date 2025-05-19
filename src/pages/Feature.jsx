@@ -11,7 +11,7 @@ import FeatureServices from "../services/feature.services";
 const {
   processGetFeature,
   processAddFeature,
-  processDeleteFeature,
+  // processDeleteFeature,
   processEditFeature,
 } = FeatureServices;
 
@@ -57,16 +57,16 @@ const Feature = () => {
   });
 
   // Delete feature
-  const { mutate: deleteFeature, isPending: isDeleting } = useMutation({
-    mutationFn: (id) => processDeleteFeature(id),
-    onSuccess: () => {
-      message.success("Feature deleted successfully");
-      queryClient.invalidateQueries({ queryKey: ["features"] });
-    },
-    onError: () => {
-      message.error("Failed to delete feature");
-    },
-  });
+  // const { mutate: deleteFeature, isPending: isDeleting } = useMutation({
+  //   mutationFn: (id) => processDeleteFeature(id),
+  //   onSuccess: () => {
+  //     message.success("Feature deleted successfully");
+  //     queryClient.invalidateQueries({ queryKey: ["features"] });
+  //   },
+  //   onError: () => {
+  //     message.error("Failed to delete feature");
+  //   },
+  // });
 
   const handleModalCancel = () => {
     setIsModalVisible(false);
@@ -102,14 +102,14 @@ const Feature = () => {
             }}
             style={{ marginBottom: 4 }}
           />
-          <Popconfirm
+          {/* <Popconfirm
             title="Are you sure to delete this feature?"
             onConfirm={() => deleteFeature(record._id)}
             okText="Yes"
             cancelText="No"
           >
             <Button icon={<DeleteOutlined />} danger />
-          </Popconfirm>
+          </Popconfirm> */}
         </div>
       ),
     },
@@ -118,8 +118,8 @@ const Feature = () => {
   return (
     <div className="w-full bg-white my-6 p-8 rounded-md">
       <div className="flex justify-between mb-4">
-        <h1 className="text-2xl font-bold">Spare Parts Feature</h1>
-        <Button
+        <h1 className="text-2xl font-bold">Services</h1>
+        {/* <Button
           className="custom-button"
           onClick={() => {
             setEditingFeature(null);
@@ -128,15 +128,17 @@ const Feature = () => {
           }}
         >
           <PlusSquareOutlined /> Add New
-        </Button>
+        </Button> */}
       </div>
 
       <Table
         dataSource={features}
         columns={columns}
         rowKey="_id"
-        loading={isPending || isDeleting}
+        // loading={isPending || isDeleting}
+        loading={isPending }
         scroll={{ x: "max-content" }}
+        pagination={false}
       />
 
       <Modal

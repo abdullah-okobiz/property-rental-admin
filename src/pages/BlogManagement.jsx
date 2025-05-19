@@ -8,6 +8,7 @@ import {
   Upload,
   Popconfirm,
   message,
+  Image,
 } from "antd";
 import { useState, useEffect } from "react";
 import {
@@ -199,8 +200,9 @@ const BlogManagement = () => {
       dataIndex: "blogImage",
       key: "blogImage",
       render: (imgUrl) => (
-        <img
+        <Image
           src={`${baseUrl}${imgUrl}`}
+          width={100}
           alt="blog"
           className="w-[200px] rounded"
         />

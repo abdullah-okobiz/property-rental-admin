@@ -125,7 +125,7 @@ const Category = () => {
       key: "categoryName",
     },
     {
-      title: "Feature",
+      title: "Service",
       dataIndex: "feature",
       key: "feature",
       render: (featureIds) => {
