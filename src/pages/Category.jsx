@@ -175,7 +175,7 @@ const Category = () => {
             setEditingCategory(null);
             setIsModalVisible(true);
           }}
-          disabled={!activeFeatureId}
+          // disabled={!activeFeatureId}
         >
           <PlusSquareOutlined /> Add New
         </Button>
