@@ -2,10 +2,10 @@ import axiosClient from "../configs/axios.config";
 
 const BlogApis = {
   getBlogsApi: () => {
-    return axiosClient.get("/admin/blog");
+    return axiosClient.get("/blog");
   },
   getBlogByIdApi: (id) => {
-    return axiosClient.get(`/admin/blog/${id}`);
+    return axiosClient.get(`/blog/${id}`);
   },
   addBlogApi: (payload) => {
     return axiosClient.post("/admin/blog", payload, {
@@ -22,6 +22,7 @@ const BlogApis = {
     });
   },
   editBlogFieldApi: (id, payload) => {
+    console.log("editBlogFieldApi", payload);
     return axiosClient.patch(`/admin/blog/${id}`, payload, {
       headers: {
         "Content-Type": "multipart/form-data",

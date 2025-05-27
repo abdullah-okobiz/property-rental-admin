@@ -93,7 +93,7 @@ const HostManagement = () => {
       dataIndex: "avatar",
       render: (avatar) =>
         avatar ? (
-          <Image width={40} height={40} src={avatar} alt="avatar" />
+          <Image width={40} height={40} src={baseUrl+avatar} alt="avatar" />
         ) : (
           <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center">
             N/A

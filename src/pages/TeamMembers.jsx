@@ -268,6 +268,7 @@ import {
   Upload,
   message,
   Popconfirm,
+  Image,
 } from "antd";
 import {
   EditOutlined,
@@ -416,9 +417,10 @@ const TeamMembers = () => {
       render: (_, record) => (
         <div>
           {record?.teamMemberImage ? (
-            <img
+            <Image
               src={`${baseUrl}${record?.teamMemberImage}`}
               alt="Team"
+              placeholder
               style={{
                 width: 50,
                 height: 50,

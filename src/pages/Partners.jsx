@@ -1,4 +1,13 @@
-import { Button, Form, Modal, Popconfirm, Table, Upload, message } from "antd";
+import {
+  Button,
+  Form,
+  Image,
+  Modal,
+  Popconfirm,
+  Table,
+  Upload,
+  message,
+} from "antd";
 import {
   EditOutlined,
   DeleteOutlined,
@@ -113,6 +122,7 @@ const Partners = () => {
         addMutation.mutate(formData);
       }
     } catch (error) {
+      console.log(error);
       message.error("Failed to submit");
     }
   };
@@ -124,7 +134,8 @@ const Partners = () => {
       key: "partnerImage",
       render: (_, record) =>
         record?.partnerImage ? (
-          <img
+          <Image
+          width={100}
             src={`${baseUrl}${record.partnerImage}`}
             alt="Partner Media"
             className="w-[200px] rounded"

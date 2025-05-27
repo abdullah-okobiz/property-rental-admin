@@ -8,7 +8,6 @@ const { Header, Sider, Content } = Layout;
 import React, { useState } from "react";
 import { menuItems } from "../constants/navItems";
 import RenderdMenuItems from "../components/RenderedMenuItems";
-import { getFirstLetters } from "../utils/getFirstLetters";
 import AuthServices from "../services/auth.services";
 import { useMutation } from "@tanstack/react-query";
 const { processLogout } = AuthServices;

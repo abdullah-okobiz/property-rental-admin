@@ -63,6 +63,7 @@ const BlogServices = {
   },
   processEditBlogField: async (id, payload) => {
     try {
+      console.log("processEditBlogField", payload);
       const response = await editBlogFieldApi(id, payload);
       return response?.data;
     } catch (error) {

@@ -5,6 +5,7 @@ const {
   deleteWhyChooseUsApi,
   editWhyChooseUsApi,
   getWhyChooseUsApi,
+  editWhyChooseUsFieldApi,
 } = WhyChooseUsApis;
 
 const WhyChooseUsServices = {
@@ -28,6 +29,15 @@ const WhyChooseUsServices = {
     try {
       console.log(id, payload);
       const response = await editWhyChooseUsApi(id, payload);
+      return response?.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+  processEditWhyChooseUsField: async (id, payload) => {
+    try {
+      console.log(id, payload);
+      const response = await editWhyChooseUsFieldApi(id, payload);
       return response?.data;
     } catch (error) {
       throw error;
