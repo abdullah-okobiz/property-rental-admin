@@ -11,6 +11,11 @@ const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     (async () => {
+      const hasLoggedOut = localStorage.getItem("hasLoggedOut");
+      if (hasLoggedOut) {
+        localStorage.removeItem("hasLoggedOut");
+        return;
+      }
       const accessToken = localStorage.getItem("accessToken");
       if (accessToken) {
         try {

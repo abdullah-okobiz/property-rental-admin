@@ -18,6 +18,7 @@ const Main = () => {
     mutationFn: processLogout,
     onSuccess: () => {
       message.success("Logout Successful");
+      localStorage.setItem("hasLoggedOut", "true");
       localStorage.removeItem("accessToken");
       setTimeout(() => {
         window.location.reload();
