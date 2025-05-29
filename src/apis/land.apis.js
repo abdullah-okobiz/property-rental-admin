@@ -2,9 +2,15 @@ import axiosClient from "../configs/axios.config";
 
 const LandApis = {
   findAllLands: ({ page, status, sort, search, isSold }) => {
-    return axiosClient.get(
-      `/land?page=${page}&publishStatus=${status}&sort=${sort}&search=${search}&isSold=${isSold}`
-    );
+    const params = new URLSearchParams();
+
+    if (page !== undefined) params.append("page", String(page));
+    if (status) params.append("publishStatus", status);
+    if (typeof isSold === "boolean") params.append("isSold", String(isSold));
+    if (search) params.append("search", search);
+    if (sort) params.append("sort", sort);
+
+    return axiosClient.get(`/land?${params.toString()}`);
   },
   changeStatus: ({ id, payload }) => {
     return axiosClient.patch(`/admin/land/${id}`, payload);
