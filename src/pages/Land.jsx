@@ -26,7 +26,7 @@ const Land = () => {
   const [page, setPage] = useState();
   const [isModalOpen, setIsModalOpen] = useState();
   const [selectedLand, setSelectedLand] = useState(null);
-  const [isSold, setIsSold] = useState();
+  const [isSold, setIsSold] = useState(false);
 
   const queryClient = useQueryClient();
 
@@ -38,7 +38,7 @@ const Land = () => {
         status: statusFilter || "",
         sort: sortOrder || "",
         search: searchText || "",
-        isSold: isSold || "",
+        isSold: isSold,
       }),
     keepPreviousData: true,
   });
