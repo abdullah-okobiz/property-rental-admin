@@ -88,31 +88,31 @@ const Feature = () => {
       dataIndex: "featureName",
       key: "featureName",
     },
-    {
-      title: "Actions",
-      key: "actions",
-      render: (_, record) => (
-        <div className="flex flex-col gap-1">
-          <Button
-            icon={<EditOutlined />}
-            onClick={() => {
-              setEditingFeature(record);
-              setIsModalVisible(true);
-              form.setFieldsValue({ featureName: record.featureName });
-            }}
-            style={{ marginBottom: 4 }}
-          />
-          {/* <Popconfirm
-            title="Are you sure to delete this feature?"
-            onConfirm={() => deleteFeature(record._id)}
-            okText="Yes"
-            cancelText="No"
-          >
-            <Button icon={<DeleteOutlined />} danger />
-          </Popconfirm> */}
-        </div>
-      ),
-    },
+    // {
+    //   title: "Actions",
+    //   key: "actions",
+    //   render: (_, record) => (
+    //     <div className="flex flex-col gap-1">
+    //       {/* <Button
+    //         icon={<EditOutlined />}
+    //         onClick={() => {
+    //           setEditingFeature(record);
+    //           setIsModalVisible(true);
+    //           form.setFieldsValue({ featureName: record.featureName });
+    //         }}
+    //         style={{ marginBottom: 4 }}
+    //       /> */}
+    //       {/* <Popconfirm
+    //         title="Are you sure to delete this feature?"
+    //         onConfirm={() => deleteFeature(record._id)}
+    //         okText="Yes"
+    //         cancelText="No"
+    //       >
+    //         <Button icon={<DeleteOutlined />} danger />
+    //       </Popconfirm> */}
+    //     </div>
+    //   ),
+    // },
   ];
 
   return (
@@ -136,7 +136,7 @@ const Feature = () => {
         columns={columns}
         rowKey="_id"
         // loading={isPending || isDeleting}
-        loading={isPending }
+        loading={isPending}
         scroll={{ x: "max-content" }}
         pagination={false}
       />
