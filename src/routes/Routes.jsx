@@ -94,6 +94,8 @@ import Flat from "../pages/Flat";
 import Rent from "../pages/Rent";
 import Amenities from "../pages/Amenities";
 import RoleProtected from "../components/RoleProtected";
+import FlatBook from "../pages/FlatBook";
+import LandBook from "../pages/LandBook";
 
 const Routes = createBrowserRouter([
   {
@@ -276,6 +278,25 @@ const Routes = createBrowserRouter([
         element: (
           <RoleProtected allowedRoles={["admin", "listingVerificationManager"]}>
             <Rent />
+          </RoleProtected>
+        ),
+      },
+
+      // booking management
+      {
+        path: "/booking/land",
+        element: (
+          <RoleProtected allowedRoles={["admin"]}>
+            {/* <Land /> */}
+            <LandBook />
+          </RoleProtected>
+        ),
+      },
+      {
+        path: "/booking/flatBook",
+        element: (
+          <RoleProtected allowedRoles={["admin"]}>
+            <FlatBook />
           </RoleProtected>
         ),
       },

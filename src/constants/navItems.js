@@ -9,6 +9,7 @@ import {
   FaBuilding,
   FaTree,
   FaCogs,
+  FaBookmark
 } from "react-icons/fa";
 import {
   FiStar,
@@ -37,6 +38,17 @@ export const menuItems = [
       { key: "listing/rent", label: "Rents", icon: FaHome },
       { key: "listing/flat", label: "Flat", icon: FaBuilding },
       { key: "listing/land", label: "Land", icon: FaTree },
+
+     
+    ],
+  },
+  {
+    key: "bookings",
+    label: "Booking",
+    icon: FaBookmark,
+    children: [
+      { key: "booking/land", label: "Land", icon: FaTree },
+      { key: "booking/flatBook", label: "Flat", icon: FaTree },
     ],
   },
   { key: "contact_us", label: "Contact Us", icon: FiPhoneCall },
